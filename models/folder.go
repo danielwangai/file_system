@@ -20,7 +20,7 @@ var filingSystem []*Folder
 
 // CreateRootFolder adds a new folder to the root of the file system
 func (f *Folder) CreateRootFolder() (*Folder, error) {
-	err := validateFolderName(f.Name)
+	err := validateFolderRootName(f.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (f *Folder) CreateRootFolder() (*Folder, error) {
 
 // CreateSubFolder adds a new folder within an existing folder
 func (f *Folder) CreateSubFolder(name string) (*Folder, error) {
-	err := validateFolderName(name)
+	err := f.validateFolder(name)
 	if err != nil {
 		return nil, err
 	}
@@ -99,12 +99,26 @@ func (f *Folder) deleteFolderHelper(deletingFolder *Folder) {
 	}
 }
 
-func validateFolderName(name string) error {
+// validateFolderRootName ensures that a folder name is unique within the current folder
+// TODO: join folder name validators into one function
+func validateFolderRootName(name string) error {
 	if name == "" {
 		return errors.New("folder name required")
 	}
 	for _, folder := range filingSystem {
 		if name == folder.Name {
+			return errors.New("a folder with the same name exists")
+		}
+	}
+	return nil
+}
+
+func (f Folder) validateFolder(name string) error {
+	if name == "" {
+		return errors.New("folder name required")
+	}
+	for _, folder := range f.Children {
+		if folder.Name == name {
 			return errors.New("a folder with the same name exists")
 		}
 	}
