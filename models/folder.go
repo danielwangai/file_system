@@ -75,6 +75,30 @@ func (f *Folder) UpdateFolder(newName string) (*Folder, error) {
 	return f, nil
 }
 
+// MoveFolder moves folder from one location to another
+func (f *Folder) MoveFolder(destFolder *Folder) {
+	/*
+		TODO:
+			- reject moving a folder if user has insufficient permissions
+			- prevent moving to a folder where user has no permission
+	*/
+	parent := f.Parent
+	// delete folder from the existing directory
+	parent.deleteFolderHelper(f)
+	// move to new folder
+	destFolder.Children = append(destFolder.Children, f)
+}
+
+// deleteFolderHelper deletes sub-folder within a folder
+func (f *Folder) deleteFolderHelper(deletingFolder *Folder) {
+	for i, subFolder := range f.Children {
+		if deletingFolder == subFolder {
+			f.Children = append(f.Children[:i], f.Children[i+1:]...)
+			break
+		}
+	}
+}
+
 func validateFolderName(name string) error {
 	if name == "" {
 		return errors.New("folder name required")
