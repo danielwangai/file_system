@@ -40,9 +40,7 @@ func (f *Folder) CreateSubFolder(name string) (*Folder, error) {
 		Name:   name,
 		Parent: f,
 	}
-	// the folder is being created within another one(as a sub-folder)
 	f.Children = append(f.Children, newFolder)
-	// parentFolder.Children = append(parentFolder.Children, f)
 	return newFolder, nil
 }
 
@@ -66,6 +64,15 @@ func (f *Folder) GetSubFolders() ([]*Folder, error) {
 		return []*Folder{}, nil
 	}
 	return f.Children, nil
+}
+
+// UpdateFolder updates a folder's name
+func (f *Folder) UpdateFolder(newName string) (*Folder, error) {
+	if newName == "" {
+		return nil, errors.New("provide a valid folder name")
+	}
+	f.Name = newName
+	return f, nil
 }
 
 func validateFolderName(name string) error {
