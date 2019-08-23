@@ -46,6 +46,20 @@ func (f *Folder) CreateSubFolder(name string) (*Folder, error) {
 	return newFolder, nil
 }
 
+// GetRootFolders ..
+func GetRootFolders() ([]*Folder, error) {
+	if len(filingSystem) == 0 {
+		return []*Folder{}, nil
+	}
+	root := []*Folder{}
+	for _, folder := range filingSystem {
+		if folder.Parent == nil {
+			root = append(root, folder)
+		}
+	}
+	return root, nil
+}
+
 func validateFolderName(name string) error {
 	if name == "" {
 		return errors.New("folder name required")
