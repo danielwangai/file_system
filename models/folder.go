@@ -46,7 +46,7 @@ func (f *Folder) CreateSubFolder(name string) (*Folder, error) {
 	return newFolder, nil
 }
 
-// GetRootFolders ..
+// GetRootFolders gets folders at the root directory
 func GetRootFolders() ([]*Folder, error) {
 	if len(filingSystem) == 0 {
 		return []*Folder{}, nil
@@ -58,6 +58,14 @@ func GetRootFolders() ([]*Folder, error) {
 		}
 	}
 	return root, nil
+}
+
+// GetSubFolders get folders within a folder
+func (f *Folder) GetSubFolders() ([]*Folder, error) {
+	if len(f.Children) == 0 {
+		return []*Folder{}, nil
+	}
+	return f.Children, nil
 }
 
 func validateFolderName(name string) error {
