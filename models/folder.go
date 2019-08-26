@@ -90,17 +90,29 @@ func (f *Folder) MoveFolder(destFolder *Folder) {
 	*/
 	parent := f.Parent
 	// delete folder from the existing directory
-	parent.deleteFolderHelper(f)
+	parent.deleteSubFolderHelper(f)
 	// move to new folder
 	destFolder.Children = append(destFolder.Children, f)
 }
 
-// deleteFolderHelper deletes sub-folder within a folder
-func (f *Folder) deleteFolderHelper(deletingFolder *Folder) {
-	for i, subFolder := range f.Children {
-		if deletingFolder == subFolder {
-			f.Children = append(f.Children[:i], f.Children[i+1:]...)
-			break
+// DeleteFolder discards a folder and it's contents
+// Implements level order(BFS) deletion: O(h) operation
+func (f *Folder) DeleteFolder() {
+	if len(f.Children) > 0 {
+		children := f.Children
+		if f.Parent == nil {
+			deleteRootFolder(f)
+		}
+		for len(children) > 0 {
+			for i, folder := range children {
+				current := folder
+				// delete first
+				children = append(children[:i], children[i+1:]...)
+				// append deleted folder's children
+				for _, child := range current.Children {
+					children = append(children, child)
+				}
+			}
 		}
 	}
 }
@@ -129,4 +141,22 @@ func (f Folder) validateFolder(name string) error {
 		}
 	}
 	return nil
+}
+
+// deleteSubFolderHelper deletes sub-folder within a folder
+func (f *Folder) deleteSubFolderHelper(deletingFolder *Folder) {
+	for i, subFolder := range f.Children {
+		if deletingFolder == subFolder {
+			f.Children = append(f.Children[:i], f.Children[i+1:]...)
+			break
+		}
+	}
+}
+
+func deleteRootFolder(f *Folder) {
+	for i, folder := range filingSystem {
+		if f == folder {
+			filingSystem = append(filingSystem[:i], filingSystem[i+1:]...)
+		}
+	}
 }
