@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"github.com/satori/go.uuid"
 )
@@ -10,9 +11,11 @@ import (
 type Folder struct {
 	ID string
 	// FolderType string // root or other
-	Name     string
-	Parent   *Folder
-	Children []*Folder
+	Name      string
+	Parent    *Folder
+	Children  []*Folder
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // store folders and files
@@ -25,6 +28,7 @@ func (f *Folder) CreateRootFolder() (*Folder, error) {
 		return nil, err
 	}
 	f.ID = uuid.Must(uuid.NewV4()).String()
+	f.CreatedAt = time.Now()
 	filingSystem = append(filingSystem, f)
 	return f, nil
 }
@@ -36,9 +40,10 @@ func (f *Folder) CreateSubFolder(name string) (*Folder, error) {
 		return nil, err
 	}
 	newFolder := &Folder{
-		ID:     uuid.Must(uuid.NewV4()).String(),
-		Name:   name,
-		Parent: f,
+		ID:        uuid.Must(uuid.NewV4()).String(),
+		Name:      name,
+		CreatedAt: time.Now(),
+		Parent:    f,
 	}
 	f.Children = append(f.Children, newFolder)
 	return newFolder, nil
@@ -72,6 +77,7 @@ func (f *Folder) UpdateFolder(newName string) (*Folder, error) {
 		return nil, errors.New("provide a valid folder name")
 	}
 	f.Name = newName
+	f.UpdatedAt = time.Now()
 	return f, nil
 }
 
